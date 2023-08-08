@@ -1,0 +1,36 @@
+.board-flex-container {
+    width: 400px;
+    height: 400px;
+    background-color: #FF6B6B;
+    border: 1px solid #cb5656;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.square {
+    width: 122px;
+    height: 122px;
+    background-color: #1E1E1E;
+    border: 1px solid #cb5656;
+    float: left;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 110px;
+    padding: 0;
+    text-align: center;
+}
+
+.board-row:after {
+    clear: both;
+    content: '';
+    display: table;
+}
+
+.status {
+    margin-bottom: 10px;
+}
