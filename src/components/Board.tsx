@@ -4,13 +4,13 @@ import { Game } from "../models/Game";
 import "../styles/Board.css";
 import Square from "./Square";
 
-export default function Board({game}: {game: Game}) {
+export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCallback: Function}) {
   const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(new Array(9).fill(null));
+  const [squares, setSquares] = useState(game.states.length > 0 ? game.states[game.states.length-1] : new Array(9).fill(null));
   const api = useMemo(() => new ApiService(), []);
 
   function handleClick(i: number) {
-    if (squares[i] || checkWinCondition(squares)) {
+    if (squares[i] || game.winner) {
       return;
     }
 
@@ -32,6 +32,7 @@ export default function Board({game}: {game: Game}) {
     api.update(game.id, state)
       .then(() => {
         setSquares(state);
+        onUpdateCallback(state);
         console.log("Updated game with id", game.id);
       })
       .catch((err) => console.error("Failed updating game!", err));
@@ -47,17 +48,13 @@ export default function Board({game}: {game: Game}) {
 
   return (
     <>
-      <div className="status">{status}</div>
-      <div className="board-flex-container">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+      <div className="flex-container-col">
+        <h1 className="status">{status}</h1>
+        <div className="board-flex-container">
+          {Array(9).fill(0).map((_, i) =>{
+            return <Square key={i} value={squares[i]} onSquareClick={() => handleClick(i)} />
+          })}
+        </div>
       </div>
     </>
   );
