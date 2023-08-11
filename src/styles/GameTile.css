@@ -10,17 +10,6 @@
     -webkit-animation: pop 0.2s ease-out forwards;
 }
 
-@keyframes pop {
-    from{transform:scale(1)}
-    /* 80%{transform:scale(1.2)} */
-    to{transform:scale(1.1)}
-}
-@-webkit-keyframes pop {
-    from{-webkit-transform:scale(1)}
-    /* 80%{-webkit-transform:scale(0.5)} */
-    to{-webkit-transform:scale(1.1)}
-}
-
 .header {
     font-size: 20px;
     margin-bottom: .5em;
@@ -29,8 +18,6 @@
 .frame {
     width: 130px;
     height: 130px;
-    background-color: #FF6B6B;
-    border: 1px solid #cb5656;
     border-radius: 3px;
     display: flex;
     flex-direction: row;
@@ -43,11 +30,19 @@
     width: 40px;
     height: 40px;
     background-color: #1E1E1E;
-    border: 1px solid #cb5656;
+    border-radius: 4px;
     float: left;
     font-size: 24px;
     font-weight: bold;
     line-height: 40px;
     padding: 0;
     text-align: center;
+}
+
+.game-tile-square-red {
+    border: 1px solid #cb5656;
+}
+
+.game-tile-square-green {
+    border: 1px solid #3e824a;
 }

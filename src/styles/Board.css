@@ -1,8 +1,6 @@
 .board-flex-container {
     width: 400px;
     height: 400px;
-    background-color: #FF6B6B;
-    border: 1px solid #cb5656;
     border-radius: 3px;
     display: flex;
     flex-direction: row;
@@ -16,7 +14,8 @@
     width: 122px;
     height: 122px;
     background-color: #1E1E1E;
-    border: 1px solid #cb5656;
+    border: 1px solid #1E1E1E;
+    border-radius: 4px;
     float: left;
     font-size: 40px;
     font-weight: bold;

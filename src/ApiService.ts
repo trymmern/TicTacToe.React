@@ -14,19 +14,27 @@ export class ApiService {
     }
 
     async create(): Promise<any> {
-        const res = await fetch(this.baseUrl + `/Create`, {method: "POST"});
+        const res = await fetch(this.baseUrl + `/Games`, {method: "POST"});
         return await res.json() as Promise<Game>
     }
 
-    async update(id: number, state: string[]): Promise<any> {
+    async update(id: number, state: string[], winner: string | null): Promise<any> {
         const options = {
             method: "POST",
-            body: JSON.stringify(state),
+            body: JSON.stringify({state, winner}),
             headers: {
                 "Content-Type": "application/json"
             }
         };
-        const res = await fetch(this.baseUrl + `/Update?id=${id}`, options);
+        const res = await fetch(this.baseUrl + `/Games/Update?id=${id}`, options);
         return await res.json() as Promise<Game>;
+    }
+
+    async delete(id: number): Promise<any> {
+        const options = {
+            method: "DELETE"
+        };
+        const res = await fetch(this.baseUrl + `/Games?id=${id}`, options);
+        return await res.json() as Promise<Game[]>
     }
 }

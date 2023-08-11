@@ -5,9 +5,24 @@ import "../styles/Board.css";
 import Square from "./Square";
 
 export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCallback: Function}) {
-  const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(game.states.length > 0 ? game.states[game.states.length-1] : new Array(9).fill(null));
+  const [squares, setSquares] = useState<string[]>(initSquares());
+  const [xIsNext, setXIsNext] = useState<boolean>(initXIsNext());
   const api = useMemo(() => new ApiService(), []);
+
+  function initSquares(): string[] {
+    console.log("InitSquares", game.states)
+    if (game.states.length > 0)
+      return game.states[game.states.length-1];
+    else
+      return new Array(9).fill(null)
+  }
+
+  function initXIsNext(): boolean {
+    const xCount = game.states[game.states.length-1].filter((s) => s === "X").length
+    const oCount = game.states[game.states.length-1].filter((s) => s === "O").length
+
+    return xCount > oCount ? false : true;
+  }
 
   function handleClick(i: number) {
     if (squares[i] || game.winner) {
@@ -21,15 +36,13 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
       nextSquares[i] = 'O';
     }
 
-    update(nextSquares)
+    update(nextSquares);
     setXIsNext(!xIsNext);
-    
-    checkWinCondition(squares)
   }
   
   function update(state: string[]): void {
-    console.log(game)
-    api.update(game.id, state)
+    game.winner = checkWinCondition(state);
+    api.update(game.id, state, game.winner)
       .then(() => {
         setSquares(state);
         onUpdateCallback(state);
@@ -38,7 +51,6 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
       .catch((err) => console.error("Failed updating game!", err));
   }
 
-  game.winner = checkWinCondition(squares);
   let status;
   if (game.winner) {
     status = "Winner: " + game.winner;
@@ -50,7 +62,7 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
     <>
       <div className="flex-container-col">
         <h1 className="status">{status}</h1>
-        <div className="board-flex-container">
+        <div className={`board-flex-container ${game.winner ? "green" : "red"}`}>
           {Array(9).fill(0).map((_, i) =>{
             return <Square key={i} value={squares[i]} onSquareClick={() => handleClick(i)} />
           })}
@@ -60,7 +72,7 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
   );
 }
 
-function checkWinCondition(squares: string[]) {
+function checkWinCondition(squares: string[]): string | null {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
