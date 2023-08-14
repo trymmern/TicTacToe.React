@@ -1,33 +1,38 @@
 import { useState } from "react";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { WS_URL } from "../App";
+import { User } from "../models/User";
 import "../styles/Login.sass";
 
-export default function Login({onLogin}: {onLogin: Function}) {
-    const [username, setUsername] = useState("");
+export default function Login({users, onLogin}: {users: User[], onLogin: Function}) {
+    const [user, setUser] = useState<User>(new User(""));
 
     useWebSocket(WS_URL, {
         share: true,
         filter: () => false
     });
 
-    const loginUser = (e: string) => {
-        if (!username.trim()) {
+    const loginUser = (user: User) => {
+        if (!user.name.trim()) {
             return;
         }
+
+        if (users.filter(u => u.id === user.id).length > 0) {
+            user.id = user.id + Math.round(Math.random() * 100)
+        }
         
-        onLogin && onLogin(e)
+        onLogin && onLogin(user)
     }
 
     return (
         <div className="login-container">
             <input 
-                value={username} 
+                value={user.name} 
                 name="username"
                 placeholder="USERNAME"
-                onChange={(e) => setUsername((e.target as HTMLInputElement).value)} 
+                onChange={(e) => setUser(new User((e.target as HTMLInputElement).value))} 
                 className="form-control" />
-            <button type="submit" onClick={() => loginUser(username)} className="menu-btn">LOG IN</button>
+            <button type="submit" onClick={() => loginUser(user)} className="menu-btn">LOG IN</button>
         </div>
     )
 } 

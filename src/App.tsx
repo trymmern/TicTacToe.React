@@ -8,6 +8,7 @@ import GameTile from "./components/GameTile";
 import Login from "./components/Login";
 import Nav from "./components/Nav";
 import { Game } from "./models/Game";
+import { User } from "./models/User";
 import "./styles/App.sass";
 
 export const WS_URL = "ws:localhost:5268/ws/connect"
@@ -27,9 +28,11 @@ function isGameEvent(message: any) {
 }
 
 export default function App() {
-    const [username, setUsername] = useState("Trym");
-    const [users, setUsers] = useState(["Trym", "Ole", "Knut", "Bodil"])
-    const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
+    const [user, setUser] = useState<User | null>(null);
+    const [users, setUsers] = useState<User[]>([new User("Trym"), new User("Ole Finn"), new User("Knut Arild"), new User("Bodil Jensen")]);
+    const [games, setGames] = useState<Game[]>([]);
+    const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined)
+    const { sendJsonMessage, readyState } = useWebSocket(`${WS_URL}?username=${user?.name}`, {
         onOpen: () => {
             console.log("Websocket connection established");
         },
@@ -38,15 +41,12 @@ export default function App() {
         retryOnError: true,
         shouldReconnect: () => true
     });
-
-    const [games, setGames] = useState<Game[]>([]);
-    const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined)
     const api = useMemo(() => new ApiService(), []);
 
     useEffect(() => {
-        if (username && readyState === ReadyState.OPEN) {
+        if (user && readyState === ReadyState.OPEN) {
             sendJsonMessage({
-                username,
+                user: JSON.stringify(user),
                 type: EVENTS.USEREVENT
             })
         }
@@ -68,7 +68,7 @@ export default function App() {
                 };
             })
             .catch((err) => console.error("Received an error while getting all games", err));
-    }, [api, games, username, readyState, sendJsonMessage]);
+    }, [api, games, user, readyState, sendJsonMessage]);
 
     const handleMenuClicked = () => {
         setSelectedGame(undefined)
@@ -112,11 +112,11 @@ export default function App() {
 
     return (
         <>
-            {!username ? 
-                <Login onLogin={(e: string) => setUsername(e)} /> 
+            {!user ? 
+                <Login users={users} onLogin={(user: User) => setUser(user)} /> 
                 :
                 <div id="content">
-                    <Nav username={username} onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
+                    <Nav user={user} onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
                     <div className="flex-container">
                         {games.map((game: Game, index: number) => {
                             if (!selectedGame)
@@ -128,7 +128,7 @@ export default function App() {
                         })}
                         {selectedGame && <Board game={selectedGame} onUpdateCallback={onUpdate}/>}
                     </div>
-                    <Footer user={username} users={users}></Footer>
+                    <Footer user={user} users={users}></Footer>
                 </div>
             }
         </>

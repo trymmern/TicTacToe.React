@@ -6,7 +6,6 @@ export default function GameTile({game, onTileClick, onDeleteClick}:
     {game: Game, onTileClick: MouseEventHandler, onDeleteClick: MouseEventHandler}) {
 
     const lastState = game.states.at(-1);
-    console.log(game.winner)
 
     return (
         <>

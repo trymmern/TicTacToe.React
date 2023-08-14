@@ -10,7 +10,6 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
   const api = useMemo(() => new ApiService(), []);
 
   function initSquares(): string[] {
-    console.log("InitSquares", game.states)
     if (game.states.length > 0)
       return game.states[game.states.length-1];
     else
@@ -46,7 +45,6 @@ export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCal
       .then(() => {
         setSquares(state);
         onUpdateCallback(state);
-        console.log("Updated game with id", game.id);
       })
       .catch((err) => console.error("Failed updating game!", err));
   }
