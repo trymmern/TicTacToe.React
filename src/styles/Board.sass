@@ -1,3 +1,5 @@
+@use "theme/Colors" as c
+    
 .board-flex-container
     width: 400px
     height: 400px
@@ -12,8 +14,7 @@
 .square
     width: 122px
     height: 122px
-    background-color: #1E1E1E
-    border: 1px solid #1E1E1E
+    background-color: c.$background
     border-radius: 4px
     float: left
     font-size: 40px

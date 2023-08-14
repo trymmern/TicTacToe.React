@@ -1,8 +1,15 @@
-@use "Colors" as c
+@use "theme/Colors" as c
     
 .footer-container
+    width: 100%
     position: fixed
     left: 0
     bottom: 0
-    width: 100%
-    border-top: 1px solid c.$border-red
+    padding: 2em
+    background-color: c.$background-2
+    // border-top: 1px solid c.$border-red
+    display: flex
+    justify-content: flex-start
+
+    & .user-info
+        margin-right: 1em
