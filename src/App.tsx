@@ -1,18 +1,57 @@
 import { useEffect, useMemo, useState } from "react";
+import { ReadyState } from "react-use-websocket";
+import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { ApiService } from "./ApiService";
 import Board from "./components/Board";
+import Footer from "./components/Footer";
 import GameTile from "./components/GameTile";
+import Login from "./components/Login";
 import Nav from "./components/Nav";
 import { Game } from "./models/Game";
-import "./styles/App.css";
+import "./styles/App.sass";
+
+export const WS_URL = "ws:localhost:5268/ws/connect"
+export const EVENTS = {
+    USEREVENT: "userevent",
+    GAMEEVENT: "gameevent"
+}
+
+function isUserEvent(message: any) {
+    let evt = JSON.parse(message.data);
+    return evt.type === EVENTS.USEREVENT;
+}
+
+function isGameEvent(message: any) {
+    let evt = JSON.parse(message.data);
+    return evt.type === EVENTS.GAMEEVENT;
+}
 
 export default function App() {
+    const [username, setUsername] = useState("Trym");
+    const [users, setUsers] = useState(["Trym", "Ole", "Knut", "Bodil"])
+    const { sendJsonMessage, readyState } = useWebSocket(WS_URL, {
+        onOpen: () => {
+            console.log("Websocket connection established");
+        },
+        share: true,
+        filter: () => false,
+        retryOnError: true,
+        shouldReconnect: () => true
+    });
+
     const [games, setGames] = useState<Game[]>([]);
     const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined)
     const api = useMemo(() => new ApiService(), []);
 
     useEffect(() => {
-        // Do not run this method if there are Games in the array
+        if (username && readyState === ReadyState.OPEN) {
+            sendJsonMessage({
+                username,
+                type: EVENTS.USEREVENT
+            })
+        }
+
+        // Do not run if there are Games in the array
         if (games.length > 0) return;
 
         api.getAll()
@@ -23,13 +62,13 @@ export default function App() {
                             console.log("Create game?")
                             setGames([new Game(newGameData)]);
                         })
-                        .catch((err) => console.error("Failed creating game!", err));
+                        .catch((err) => console.error("Received an error while creating game", err));
                 } else {
                     setGames(parseGameArrayJson(data))
                 };
             })
-            .catch((err) => console.error("Failed getting all games!", err));
-    }, [api, games]);
+            .catch((err) => console.error("Received an error while getting all games", err));
+    }, [api, games, username, readyState, sendJsonMessage]);
 
     const handleMenuClicked = () => {
         setSelectedGame(undefined)
@@ -73,18 +112,25 @@ export default function App() {
 
     return (
         <>
-            <Nav onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
-            <div className="flex-container">
-                {games.map((game: Game, index: number) => {
-                    if (!selectedGame)
-                        return <GameTile key={index} game={game} 
-                            onTileClick={() => setSelectedGame(game)}
-                            onDeleteClick={() => handleDeleteClicked(game.id)}></GameTile>
-                    else
-                        return null;
-                })}
-                {selectedGame && <Board game={selectedGame} onUpdateCallback={onUpdate}/>}
-            </div>
+            {!username ? 
+                <Login onLogin={(e: string) => setUsername(e)} /> 
+                :
+                <div id="content">
+                    <Nav username={username} onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
+                    <div className="flex-container">
+                        {games.map((game: Game, index: number) => {
+                            if (!selectedGame)
+                                return <GameTile key={index} game={game} 
+                                    onTileClick={() => setSelectedGame(game)}
+                                    onDeleteClick={() => handleDeleteClicked(game.id)}></GameTile>
+                            else
+                                return null;
+                        })}
+                        {selectedGame && <Board game={selectedGame} onUpdateCallback={onUpdate}/>}
+                    </div>
+                    <Footer user={username} users={users}></Footer>
+                </div>
+            }
         </>
     );
 }

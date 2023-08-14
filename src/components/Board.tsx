@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ApiService } from "../ApiService";
 import { Game } from "../models/Game";
-import "../styles/Board.css";
+import "../styles/Board.sass";
 import Square from "./Square";
 
 export default function Board({game, onUpdateCallback}: {game: Game, onUpdateCallback: Function}) {
