@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { ApiService } from "./ApiService";
+import { ApiService } from "./Services/ApiService";
 import Board from "./components/Board";
 import Footer from "./components/Footer";
 import GameTile from "./components/GameTile";

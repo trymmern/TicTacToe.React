@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ApiService } from "../ApiService";
+import { ApiService } from "../Services/ApiService";
 import { Game } from "../models/Game";
 import "../styles/Board.sass";
 import Square from "./Square";

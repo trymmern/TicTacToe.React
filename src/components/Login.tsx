@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
 import { WS_URL } from "../App";
-import "../styles/Login.css";
+import "../styles/Login.sass";
 
 export default function Login({onLogin}: {onLogin: Function}) {
     const [username, setUsername] = useState("");

@@ -1,0 +1,31 @@
+.board-flex-container
+    width: 400px
+    height: 400px
+    border-radius: 3px
+    display: flex
+    flex-direction: row
+    flex-wrap: wrap
+    align-items: center
+    justify-content: space-between
+    padding: 10px
+
+.square
+    width: 122px
+    height: 122px
+    background-color: #1E1E1E
+    border: 1px solid #1E1E1E
+    border-radius: 4px
+    float: left
+    font-size: 40px
+    font-weight: bold
+    line-height: 122px
+    padding: 0
+    text-align: center
+
+.board-row:after
+    clear: both
+    content: ''
+    display: table
+
+.status
+    margin-bottom: 10px

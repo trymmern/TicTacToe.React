@@ -1,4 +1,5 @@
 import Avatar from "react-avatar"
+import "../styles/Footer.sass"
 
 export default function Footer({user, users}: {user: string, users: string[]}) {
     return (

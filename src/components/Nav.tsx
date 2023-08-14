@@ -1,7 +1,7 @@
 import { MouseEventHandler } from "react";
 import Avatar from "react-avatar";
 import { UncontrolledTooltip } from "reactstrap";
-import "../styles/Nav.css";
+import "../styles/Nav.sass";
 
 export default function Nav({username, onMenuClicked, onNewGameClicked}: 
     {username: string, onMenuClicked: MouseEventHandler, onNewGameClicked: MouseEventHandler}) {

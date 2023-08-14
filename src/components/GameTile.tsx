@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
 import { Game } from "../models/Game";
-import "../styles/GameTile.css";
+import "../styles/GameTile.sass";
 
 export default function GameTile({game, onTileClick, onDeleteClick}: 
     {game: Game, onTileClick: MouseEventHandler, onDeleteClick: MouseEventHandler}) {
