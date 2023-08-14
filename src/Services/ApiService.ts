@@ -1,4 +1,4 @@
-import { Game } from "./models/Game";
+import { Game } from "../models/Game";
 
 export class ApiService {
     baseUrl: string = "http://localhost:5268";
