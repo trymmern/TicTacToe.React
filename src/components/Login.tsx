@@ -1,16 +1,9 @@
 import { useState } from "react";
-import { useWebSocket } from "react-use-websocket/dist/lib/use-websocket";
-import { WS_URL } from "../App";
 import { User } from "../models/User";
 import "../styles/Login.sass";
 
 export default function Login({users, onLogin}: {users: User[], onLogin: Function}) {
     const [user, setUser] = useState<User>(new User(""));
-
-    useWebSocket(WS_URL, {
-        share: true,
-        filter: () => false
-    });
 
     const loginUser = (user: User) => {
         if (!user.name.trim()) {

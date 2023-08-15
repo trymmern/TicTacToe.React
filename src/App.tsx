@@ -5,6 +5,7 @@ import { ApiService } from "./Services/ApiService";
 import Board from "./components/Board";
 import Footer from "./components/Footer";
 import GameTile from "./components/GameTile";
+import History from "./components/History";
 import Login from "./components/Login";
 import Nav from "./components/Nav";
 import { Game } from "./models/Game";
@@ -13,35 +14,35 @@ import "./styles/App.sass";
 
 export const WS_URL = "ws:localhost:5268/ws/connect"
 export const EVENTS = {
-    USEREVENT: "userevent",
-    GAMEEVENT: "gameevent"
+    USEREVENT: "userEvent",
+    GAMEEVENT: "gameEvent"
 }
 
-function isUserEvent(message: any) {
+export function isUserEvent(message: any) {
     let evt = JSON.parse(message.data);
     return evt.type === EVENTS.USEREVENT;
 }
 
-function isGameEvent(message: any) {
+export function isGameEvent(message: any) {
     let evt = JSON.parse(message.data);
     return evt.type === EVENTS.GAMEEVENT;
 }
 
 export default function App() {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(); //new User("Bob")
     const [users, setUsers] = useState<User[]>([new User("Trym"), new User("Ole Finn"), new User("Knut Arild"), new User("Bodil Jensen")]);
     const [games, setGames] = useState<Game[]>([]);
     const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined)
-    const { sendJsonMessage, readyState } = useWebSocket(`${WS_URL}?username=${user?.name}`, {
-        onOpen: () => {
-            console.log("Websocket connection established");
-        },
+    const api = useMemo(() => new ApiService(), []);
+    
+    const { sendJsonMessage, lastJsonMessage, lastMessage, readyState } = useWebSocket(`${WS_URL}?userId=${user?.id}`, {
+        onOpen: () => console.log("WebSocket connection established"),
+        onClose: () => console.log("WebSocket connection closed"),
         share: true,
         filter: () => false,
         retryOnError: true,
         shouldReconnect: () => true
-    });
-    const api = useMemo(() => new ApiService(), []);
+    }, user ? true : false);
 
     useEffect(() => {
         if (user && readyState === ReadyState.OPEN) {
@@ -49,6 +50,7 @@ export default function App() {
                 user: JSON.stringify(user),
                 type: EVENTS.USEREVENT
             })
+            console.log(lastJsonMessage, lastMessage)
         }
 
         // Do not run if there are Games in the array
@@ -68,7 +70,7 @@ export default function App() {
                 };
             })
             .catch((err) => console.error("Received an error while getting all games", err));
-    }, [api, games, user, readyState, sendJsonMessage]);
+    }, [api, games, user, readyState, sendJsonMessage, lastJsonMessage]);
 
     const handleMenuClicked = () => {
         setSelectedGame(undefined)
@@ -113,9 +115,10 @@ export default function App() {
     return (
         <>
             {!user ? 
-                <Login users={users} onLogin={(user: User) => setUser(user)} /> 
+                <Login users={users} onLogin={setUser} /> 
                 :
                 <div id="content">
+                    <History user={user}></History>
                     <Nav user={user} onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
                     <div className="flex-container">
                         {games.map((game: Game, index: number) => {

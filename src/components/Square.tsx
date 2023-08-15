@@ -8,4 +8,4 @@ export default function Square({value, onSquareClick}: {value: string, onSquareC
         onClick={onSquareClick}>{value}
       </button>
     )
-  }
+}

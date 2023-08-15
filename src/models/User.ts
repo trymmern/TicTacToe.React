@@ -2,7 +2,7 @@ export class User {
     
     constructor(name: string) {
         if (!this.id) {
-            this.id = name.replace(" ", "-").toLowerCase();
+            this.id = name.replaceAll(" ", "-").toLowerCase();
         }
         this.name = name;
     }
