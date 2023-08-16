@@ -69,16 +69,7 @@ export default function App() {
 
         api.getAll()
             .then((data) => {
-                if (JSON.parse(data).length === 0) {
-                    api.create()
-                        .then((newGameData) => {
-                            console.log("Create game?")
-                            setGames([new Game(newGameData)]);
-                        })
-                        .catch((err) => console.error("Received an error while creating game", err));
-                } else {
-                    setGames(parseGameArrayJson(data))
-                };
+                setGames(parseGameArrayJson(data))
             })
             .catch((err) => console.error("Received an error while getting all games", err));
     }, [api, games, user, readyState, sendJsonMessage, lastJsonMessage, users]);
