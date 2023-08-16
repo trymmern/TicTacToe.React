@@ -5,9 +5,9 @@ import { ApiService } from "./Services/ApiService";
 import Board from "./components/Board";
 import Footer from "./components/Footer";
 import GameTile from "./components/GameTile";
-import History from "./components/History";
 import Login from "./components/Login";
 import Nav from "./components/Nav";
+import SideBar from "./components/SideBar";
 import { Game } from "./models/Game";
 import { User } from "./models/User";
 import "./styles/App.sass";
@@ -15,12 +15,18 @@ import "./styles/App.sass";
 export const WS_URL = "ws:localhost:5268/ws/connect"
 export const EVENTS = {
     USEREVENT: "userEvent",
+    ACTIVITYEVENT: "activityEvent",
     GAMEEVENT: "gameEvent"
 }
 
 export function isUserEvent(message: any) {
     let evt = JSON.parse(message.data);
-    return evt.type === EVENTS.USEREVENT;
+    return evt.eventType === EVENTS.USEREVENT;
+}
+
+export function isActivityEvent(message: any) {
+    let evt = JSON.parse(message.data);
+    return evt.eventType === EVENTS.ACTIVITYEVENT;
 }
 
 export function isGameEvent(message: any) {
@@ -29,13 +35,13 @@ export function isGameEvent(message: any) {
 }
 
 export default function App() {
-    const [user, setUser] = useState<User | null>(); //new User("Bob")
-    const [users, setUsers] = useState<User[]>([new User("Trym"), new User("Ole Finn"), new User("Knut Arild"), new User("Bodil Jensen")]);
+    const [user, setUser] = useState<User | null>(new User("Bob Arne"));
+    const [users, setUsers] = useState<User[]>([new User("Trym"), new User("Ole Finn")]);
     const [games, setGames] = useState<Game[]>([]);
     const [selectedGame, setSelectedGame] = useState<Game | undefined>(undefined)
     const api = useMemo(() => new ApiService(), []);
     
-    const { sendJsonMessage, lastJsonMessage, lastMessage, readyState } = useWebSocket(`${WS_URL}?userId=${user?.id}`, {
+    const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(`${WS_URL}?userId=${user?.id}`, {
         onOpen: () => console.log("WebSocket connection established"),
         onClose: () => console.log("WebSocket connection closed"),
         share: true,
@@ -49,8 +55,13 @@ export default function App() {
             sendJsonMessage({
                 user: JSON.stringify(user),
                 type: EVENTS.USEREVENT
-            })
-            console.log(lastJsonMessage, lastMessage)
+            });
+
+            if (!users.includes(user!)) {
+                const nextUsers = users.slice();
+                nextUsers.push(user!)
+                setUsers(nextUsers);
+            }
         }
 
         // Do not run if there are Games in the array
@@ -70,7 +81,7 @@ export default function App() {
                 };
             })
             .catch((err) => console.error("Received an error while getting all games", err));
-    }, [api, games, user, readyState, sendJsonMessage, lastJsonMessage]);
+    }, [api, games, user, readyState, sendJsonMessage, lastJsonMessage, users]);
 
     const handleMenuClicked = () => {
         setSelectedGame(undefined)
@@ -118,18 +129,20 @@ export default function App() {
                 <Login users={users} onLogin={setUser} /> 
                 :
                 <div id="content">
-                    <History user={user}></History>
                     <Nav user={user} onMenuClicked={() => handleMenuClicked()} onNewGameClicked={() => handleNewGameClicked()}></Nav>
                     <div className="flex-container">
-                        {games.map((game: Game, index: number) => {
-                            if (!selectedGame)
+                        <div className="games">
+                            {games.map((game: Game, index: number) => {
+                                if (!selectedGame)
                                 return <GameTile key={index} game={game} 
-                                    onTileClick={() => setSelectedGame(game)}
-                                    onDeleteClick={() => handleDeleteClicked(game.id)}></GameTile>
-                            else
+                                onTileClick={() => setSelectedGame(game)}
+                                onDeleteClick={() => handleDeleteClicked(game.id)}></GameTile>
+                                else
                                 return null;
                         })}
-                        {selectedGame && <Board game={selectedGame} onUpdateCallback={onUpdate}/>}
+                            {selectedGame && <Board game={selectedGame} onUpdateCallback={onUpdate}/>}
+                        </div>
+                        <SideBar user={user} users={users}></SideBar>
                     </div>
                     <Footer user={user} users={users}></Footer>
                 </div>

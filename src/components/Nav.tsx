@@ -14,7 +14,7 @@ export default function Nav({user, onMenuClicked, onNewGameClicked}:
                 <button className="menu-btn" onClick={onNewGameClicked}>NEW GAME</button>
             </div>
             <span id={user.id} className="user-info" key={user.id}>
-                <Avatar name={user.name} size="40" round="20px"></Avatar>
+                <Avatar name={user.name} size="40" round="20px" color={user.color}></Avatar>
             </span>
             <UncontrolledTooltip placement="bottom" target={user.id}>
                 {user.name}

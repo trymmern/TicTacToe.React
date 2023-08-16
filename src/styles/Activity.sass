@@ -1,0 +1,19 @@
+@use "theme/Colors" as c
+@use "theme/Fonts" as f
+
+ul
+    list-style-type: none
+    padding: 0
+    margin: 0
+    font-family: f.$monospaced
+
+    & li
+        margin-bottom: .5em
+
+.username
+    font-weight: bold
+
+.timestamp
+    font-family: f.$monospaced
+    color: c.$font-grey
+    margin-right: .5em
